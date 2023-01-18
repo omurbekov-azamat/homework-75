@@ -1,0 +1,1 @@
+export const Vigenere = require('caesar-salad').Vigenere;

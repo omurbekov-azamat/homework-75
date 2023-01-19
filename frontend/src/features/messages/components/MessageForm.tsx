@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
-import axiosApi from "../../axiosApi";
+import axiosApi from "../../../axiosApi";
 import {Button, Container, Grid, TextField} from "@mui/material";
-import {Decode, Encode} from "../../types";
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import {Decode, Encode} from "../../../types";
 
-const MainComponent = () => {
+const MessageForm = () => {
     const [message, setMessage] = useState({
         encode: '',
         decode: '',
@@ -72,7 +74,7 @@ const MainComponent = () => {
                             onChange={onchangeMessage}
                         />
                         <Button type="submit" color="primary" variant="contained">
-                            Down
+                            <ArrowDownwardIcon/>
                         </Button>
                     </Grid>
                     <Grid item xs>
@@ -95,7 +97,7 @@ const MainComponent = () => {
                             onChange={onchangeMessage}
                         />
                         <Button type="button" color="secondary" variant="contained" onClick={onSendDecode}>
-                            Up
+                            <ArrowUpwardIcon/>
                         </Button>
                     </Grid>
                 </Grid>
@@ -104,4 +106,4 @@ const MainComponent = () => {
     );
 };
 
-export default MainComponent;
+export default MessageForm;

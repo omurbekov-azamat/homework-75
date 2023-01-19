@@ -1,9 +1,9 @@
 import React from 'react';
-import MainComponent from "./components/Main/MainComponent";
+import MessageForm from "./features/messages/components/MessageForm";
 
 function App() {
     return (
-        <MainComponent/>
+        <MessageForm/>
     );
 }
 

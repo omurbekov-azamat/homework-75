@@ -1,16 +1,33 @@
-import React, {useState} from 'react';
-import axiosApi from "../../../axiosApi";
-import {Button, Container, Grid, TextField} from "@mui/material";
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import {Decode, Encode} from "../../../types";
+import React, {useEffect, useState} from 'react';
+import {useAppDispatch, useAppSelector} from "../../../app/hooks";
+import {createDecode, createEncode} from "../messagesThunks";
+import {selectDecoded, selectDecodeLoading, selectEncoded, selectEncodeLoading} from "../messagesSlice";
+import {Container, Grid, TextField} from "@mui/material";
+import ArrowCircleDownSharpIcon from '@mui/icons-material/ArrowCircleDownSharp';
+import {LoadingButton} from "@mui/lab";
+import {ArrowCircleUpSharp} from "@mui/icons-material";
 
 const MessageForm = () => {
+    const dispatch = useAppDispatch();
+    const encoded = useAppSelector(selectEncoded);
+    const decoded = useAppSelector(selectDecoded);
+    const encodeLoading = useAppSelector(selectEncodeLoading);
+    const decodeLoading = useAppSelector(selectDecodeLoading);
+
     const [message, setMessage] = useState({
         encode: '',
         decode: '',
         password: '',
     });
+
+    useEffect(() => {
+        setMessage(prev => ({
+            ...prev,
+            encode: decoded,
+            password: '',
+            decode: encoded,
+        }));
+    }, [encoded, decoded]);
 
     const onchangeMessage = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
@@ -18,19 +35,11 @@ const MessageForm = () => {
     };
 
     const onSendEncode = async () => {
-
         if (message.encode.length > 0) {
-            const responseEncode = await axiosApi.post<Encode>('/encode', {
-                password: message.password,
+            await dispatch(createEncode({
                 message: message.encode,
-            });
-
-            setMessage({
-                encode: '',
-                password: '',
-                decode: responseEncode.data.encoded,
-            });
-
+                password: message.password,
+            }));
         } else {
             alert('Error, Please try again!');
         }
@@ -38,20 +47,12 @@ const MessageForm = () => {
 
     const onSendDecode = async () => {
         if (message.password.length > 0 && message.decode.length > 0) {
-
-            const responseDecode = await axiosApi.post<Decode>('/decode', {
+            await dispatch(createDecode({
                 password: message.password,
                 message: message.decode,
-            });
-
-            setMessage({
-                encode: responseDecode.data.decoded,
-                decode: '',
-                password: '',
-            });
-
+            }));
         } else {
-            alert('Error, Please try again!')
+            alert('Error, Please try again!');
         }
     };
 
@@ -73,9 +74,15 @@ const MessageForm = () => {
                             value={message.encode}
                             onChange={onchangeMessage}
                         />
-                        <Button type="submit" color="primary" variant="contained">
-                            <ArrowDownwardIcon/>
-                        </Button>
+                        <LoadingButton
+                            type='submit'
+                            loading={encodeLoading}
+                            loadingPosition='start'
+                            startIcon={<ArrowCircleDownSharpIcon/>}
+                            variant='contained'
+                        >
+                            Down
+                        </LoadingButton>
                     </Grid>
                     <Grid item xs>
                         <TextField
@@ -96,9 +103,17 @@ const MessageForm = () => {
                             value={message.decode}
                             onChange={onchangeMessage}
                         />
-                        <Button type="button" color="secondary" variant="contained" onClick={onSendDecode}>
-                            <ArrowUpwardIcon/>
-                        </Button>
+                        <LoadingButton
+                            type='button'
+                            color='secondary'
+                            loading={decodeLoading}
+                            loadingPosition='start'
+                            startIcon={<ArrowCircleUpSharp/>}
+                            variant='contained'
+                            onClick={onSendDecode}
+                        >
+                            Up
+                        </LoadingButton>
                     </Grid>
                 </Grid>
             </form>
